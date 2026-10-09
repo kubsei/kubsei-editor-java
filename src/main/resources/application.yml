@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: kubsei-editor
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/kubsei_editor}
+  graphql:
+    # schema.graphqls comes from kubsei-editor-lib (classpath:graphql/)
+    graphiql:
+      enabled: ${GRAPHIQL_ENABLED:true}
+      path: /graphiql
+    http:
+      path: /graphql
+    schema:
+      printer:
+        enabled: true
+
+server:
+  port: ${SERVER_PORT:8082}
+  forward-headers-strategy: framework
+
+kubsei:
+  security:
+    jwt:
+      # Same in every kubsei service; kubsei-users signs, the rest verify. HS256 needs at least 32 bytes.
+      secret: ${JWT_SECRET}
+      issuer: ${JWT_ISSUER:kubsei}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    com.kubsei.editor: DEBUG
