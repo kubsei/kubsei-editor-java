@@ -11,6 +11,9 @@ spring:
     http:
       path: /graphql
     schema:
+      # classpath*: the default classpath: only looks in the first jar with a graphql/ folder, and graphql-java
+      # (package "graphql") sorts before kubsei-editor-lib in the CI build, so no schema was found
+      locations: classpath*:graphql/**/
       printer:
         enabled: true
 
