@@ -1,5 +1,7 @@
 package com.kubsei.editor.resolver;
 
+import com.kubsei.editor.exception.EditorException;
+import org.springframework.graphql.execution.ErrorType;
 import com.kubsei.editor.model.Canvas;
 import com.kubsei.editor.model.Layer;
 import com.kubsei.editor.model.Project;
@@ -124,7 +126,7 @@ public class ProjectMutationResolver {
     private void requireAuthentication(GraphQLContext context) {
         Boolean isAuthenticated = context.get("isAuthenticated");
         if (isAuthenticated == null || !isAuthenticated) {
-            throw new RuntimeException("Authentication required");
+            throw new EditorException(ErrorType.UNAUTHORIZED, "Authentication required");
         }
     }
 
@@ -137,7 +139,7 @@ public class ProjectMutationResolver {
             }
         }
 
-        throw new RuntimeException("Insufficient permissions. Required roles: " +
+        throw new EditorException(ErrorType.FORBIDDEN, "Insufficient permissions. Required roles: " +
                 java.util.Arrays.toString(requiredRoles));
     }
 

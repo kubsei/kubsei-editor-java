@@ -1,5 +1,7 @@
 package com.kubsei.editor.resolver;
 
+import com.kubsei.editor.exception.EditorException;
+import org.springframework.graphql.execution.ErrorType;
 import com.kubsei.editor.model.Project;
 import com.kubsei.editor.model.Role;
 import com.kubsei.editor.service.ProjectService;
@@ -36,13 +38,13 @@ public class ProjectQueryResolver {
         Set<Role> roles = extractRoles(context);
 
         return projectService.getProjectByIdAndUser(id, userId, roles)
-                .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
+                .orElseThrow(() -> new EditorException(ErrorType.NOT_FOUND, "Project not found or access denied"));
     }
 
     private void requireAuthentication(GraphQLContext context) {
         Boolean isAuthenticated = context.get("isAuthenticated");
         if (isAuthenticated == null || !isAuthenticated) {
-            throw new RuntimeException("Authentication required");
+            throw new EditorException(ErrorType.UNAUTHORIZED, "Authentication required");
         }
     }
 

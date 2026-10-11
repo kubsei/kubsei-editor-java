@@ -1,6 +1,7 @@
 package com.kubsei.editor.service;
 
-import com.kubsei.editor.exception.AuthenticationException;
+import com.kubsei.editor.exception.EditorException;
+import org.springframework.graphql.execution.ErrorType;
 import com.kubsei.editor.model.Canvas;
 import com.kubsei.editor.model.Layer;
 import com.kubsei.editor.model.Project;
@@ -89,11 +90,11 @@ public class ProjectService {
 
     public Project updateProject(String id, String name, String userId, Set<Role> roles) {
         Project project = getProjectByIdAndUser(id, userId, roles)
-                .orElseThrow(() -> new AuthenticationException("Project not found or access denied"));
+                .orElseThrow(() -> new EditorException(ErrorType.NOT_FOUND, "Project not found or access denied"));
 
         // Only owner or admin can edit
         if (!userId.equals(project.getUserId()) && !roles.contains(Role.ADMIN)) {
-            throw new AuthenticationException("Only owner can edit this project");
+            throw new EditorException(ErrorType.FORBIDDEN, "Only owner can edit this project");
         }
 
         if (name != null) {
@@ -108,11 +109,11 @@ public class ProjectService {
 
     public boolean deleteProject(String id, String userId, Set<Role> roles) {
         Project project = getProjectByIdAndUser(id, userId, roles)
-                .orElseThrow(() -> new AuthenticationException("Project not found or access denied"));
+                .orElseThrow(() -> new EditorException(ErrorType.NOT_FOUND, "Project not found or access denied"));
 
         // Only owner or admin can delete
         if (!userId.equals(project.getUserId()) && !roles.contains(Role.ADMIN)) {
-            throw new AuthenticationException("Only owner can delete this project");
+            throw new EditorException(ErrorType.FORBIDDEN, "Only owner can delete this project");
         }
 
         projectRepository.delete(project);
@@ -124,11 +125,11 @@ public class ProjectService {
     public Project saveProjectState(String id, Canvas canvas, Map<String, Object> elements,
                                      List<Layer> layers, String userId, Set<Role> roles) {
         Project project = getProjectByIdAndUser(id, userId, roles)
-                .orElseThrow(() -> new AuthenticationException("Project not found or access denied"));
+                .orElseThrow(() -> new EditorException(ErrorType.NOT_FOUND, "Project not found or access denied"));
 
         // Only owner or admin can save state
         if (!userId.equals(project.getUserId()) && !roles.contains(Role.ADMIN)) {
-            throw new AuthenticationException("Only owner can modify this project");
+            throw new EditorException(ErrorType.FORBIDDEN, "Only owner can modify this project");
         }
 
         if (canvas != null) {
@@ -157,10 +158,10 @@ public class ProjectService {
 
     public Project setProjectVisibility(String id, boolean isPublic, String userId, Set<Role> roles) {
         Project project = getProjectByIdAndUser(id, userId, roles)
-                .orElseThrow(() -> new AuthenticationException("Project not found or access denied"));
+                .orElseThrow(() -> new EditorException(ErrorType.NOT_FOUND, "Project not found or access denied"));
 
         if (!userId.equals(project.getUserId()) && !roles.contains(Role.ADMIN)) {
-            throw new AuthenticationException("Only owner can change project visibility");
+            throw new EditorException(ErrorType.FORBIDDEN, "Only owner can change project visibility");
         }
 
         project.setPublic(isPublic);
